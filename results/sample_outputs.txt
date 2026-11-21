@@ -1,0 +1,104 @@
+========================================================================================
+CS467 ADVANCED AI (MP-A13) - HOTEL & HOMESTAY REVIEW-AWARE RECOMMENDER
+Student: Nguyen Ngoc Hoang Thai | ID: 29211151440 | Section: CS467A (No. 13)
+========================================================================================
+Dataset Summary: 40 stays | 15 guests | 284 ratings | Matrix Sparsity: 52.67% missing entries
+
+----------------------------------------------------------------------------------------
+OFFLINE EVALUATION RESULTS (Per-User Holdout Test Split, Relevant >= 4 Stars)
+----------------------------------------------------------------------------------------
+             Method  Precision@5  Recall@5   RMSE    MAE
+Popularity Baseline       0.1867    0.2333 0.9094 0.7493
+  NLP Content-Based       0.3733    0.5767 0.7483 0.5933
+      User-Based CF       0.2133    0.2900 0.8278 0.6814
+Review-Aware Hybrid       0.3333    0.4822 0.7403 0.6075
+
+========================================================================================
+TEST CASE 1: STAY QUERY RECOMMENDATION
+Query: "quiet homestay near beach with strong wifi and friendly host"
+Detected Query Aspect Weights: cleanliness=0.10, location=0.34, quietness=0.22, service=0.34
+----------------------------------------------------------------------------------------
+[1A] NLP Content-Based (TF-IDF Cosine Similarity) - Top 5:
+  #1 [S005] Coral Cove Quiet Homestay (My Khe Beach, mid-range) | TF-IDF Score: 0.2121
+      Keywords: near beach, friendly host, quiet homestay, host, beach
+  #2 [S002] Calm Wave Homestay (My Khe Beach, budget) | TF-IDF Score: 0.2036
+      Keywords: near beach, homestay, friendly host, beach, beach strong
+  #3 [S004] Lantern Sand Beach Homestay (An Bang Beach, mid-range) | TF-IDF Score: 0.2030
+      Keywords: quiet homestay, homestay, friendly host, beach, host
+  #4 [S006] Driftwood Garden Homestay (An Bang Beach, budget) | TF-IDF Score: 0.1961
+      Keywords: near beach, friendly host, quiet homestay, homestay, beach
+  #5 [S007] Ocean Whisper Villa Homestay (Son Tra, mid-range) | TF-IDF Score: 0.1919
+      Keywords: homestay, friendly host, beach strong, host, strong wifi
+
+[1B] Review-Aware Hybrid (Query TF-IDF + Aspect Sentiment + Popularity) - Top 5:
+  #1 [S005] Coral Cove Quiet Homestay (My Khe Beach, mid-range) | Hybrid Score: 0.9390 | TF-IDF: 0.2121 | Aspect Sent: +0.855
+      Details: TF-IDF=0.212 | Aspects(clean=+0.92, loc=+0.66, quiet=+0.88, serv=+0.96) | Keywords: near beach, friendly host, quiet homestay, host, beach
+  #2 [S002] Calm Wave Homestay (My Khe Beach, budget) | Hybrid Score: 0.9348 | TF-IDF: 0.2036 | Aspect Sent: +0.937
+      Details: TF-IDF=0.204 | Aspects(clean=+0.95, loc=+0.86, quiet=+0.96, serv=+0.98) | Keywords: near beach, homestay, friendly host, beach, beach strong
+  #3 [S006] Driftwood Garden Homestay (An Bang Beach, budget) | Hybrid Score: 0.9112 | TF-IDF: 0.1961 | Aspect Sent: +0.931
+      Details: TF-IDF=0.196 | Aspects(clean=+0.94, loc=+0.87, quiet=+0.95, serv=+0.96) | Keywords: near beach, friendly host, quiet homestay, homestay, beach
+  #4 [S004] Lantern Sand Beach Homestay (An Bang Beach, mid-range) | Hybrid Score: 0.9003 | TF-IDF: 0.2030 | Aspect Sent: +0.842
+      Details: TF-IDF=0.203 | Aspects(clean=+0.92, loc=+0.59, quiet=+0.91, serv=+0.95) | Keywords: quiet homestay, homestay, friendly host, beach, host
+  #5 [S007] Ocean Whisper Villa Homestay (Son Tra, mid-range) | Hybrid Score: 0.8958 | TF-IDF: 0.1919 | Aspect Sent: +0.907
+      Details: TF-IDF=0.192 | Aspects(clean=+0.92, loc=+0.78, quiet=+0.97, serv=+0.96) | Keywords: homestay, friendly host, beach strong, host, strong wifi
+
+========================================================================================
+TEST CASE 2: REVIEW-AWARE RANKING VS. PLAIN STAR AVERAGE
+Demonstrates how NLP aspect sentiment penalizes star-inflated stays with negative cleanliness/quietness/service reviews and promotes genuinely high-quality stays.
+----------------------------------------------------------------------------------------
+[2A] Top 8 Ranked by PLAIN STAR AVERAGE (Ignoring Review Text):
+ plain_rank  review_aware_rank  rank_change item_id                   stay_name  avg_rating  overall_aspect_sentiment  review_aware_score
+          1                 30          -29    S035   Neon Beachfront Sky Hotel       4.714                    -0.587               3.414
+          1                 29          -28    S036 Grand Boulevard Glam Suites       4.714                    -0.488               3.504
+          3                 31          -28    S037  Instagram Palm Beach Villa       4.625                    -0.545               3.403
+          4                  1            3    S001  Breeze Palm Beach Homestay       4.600                     0.885               4.677
+          5                  2            3    S003       Son Tra Pine Homestay       4.500                     0.804               4.548
+          6                 32          -26    S038     Old Town Flash Boutique       4.333                    -0.557               3.232
+          7                  4            3    S002          Calm Wave Homestay       4.250                     0.937               4.531
+          7                  3            4    S023       Thu Bon Lantern Villa       4.250                     0.956               4.548
+
+[2B] Top 8 Ranked by REVIEW-AWARE SCORE (55% Star Avg + 45% Aspect Sentiment):
+ plain_rank  review_aware_rank  rank_change item_id                    stay_name  avg_rating  overall_aspect_sentiment  review_aware_score
+          4                  1            3    S001   Breeze Palm Beach Homestay       4.600                     0.885               4.677
+          5                  2            3    S003        Son Tra Pine Homestay       4.500                     0.804               4.548
+          7                  3            4    S023        Thu Bon Lantern Villa       4.250                     0.956               4.548
+          7                  4            3    S002           Calm Wave Homestay       4.250                     0.937               4.531
+          9                  5            4    S022   Ancient Courtyard Homestay       4.200                     0.961               4.525
+         14                  6            8    S008    Peninsula Serenity Resort       4.143                     0.974               4.505
+         16                  7            9    S006    Driftwood Garden Homestay       4.125                     0.931               4.457
+         16                  8            8    S026 Marble Mountain Garden Lodge       4.125                     0.912               4.439
+
+Key Insight - Star-Inflated Stays Demoted by Aspect Sentiment:
+  - [S035] Neon Beachfront Sky Hotel: Plain Avg 4.71★ (Rank #1) -> Review-Aware 3.41 (Rank #30, change -29) | clean=-0.84, loc=+0.43, quiet=-0.94, serv=-1.00
+  - [S036] Grand Boulevard Glam Suites: Plain Avg 4.71★ (Rank #1) -> Review-Aware 3.50 (Rank #29, change -28) | clean=-0.74, loc=+0.71, quiet=-0.94, serv=-0.99
+  - [S037] Instagram Palm Beach Villa: Plain Avg 4.62★ (Rank #3) -> Review-Aware 3.40 (Rank #31, change -28) | clean=-0.75, loc=+0.50, quiet=-0.96, serv=-0.97
+  - [S038] Old Town Flash Boutique: Plain Avg 4.33★ (Rank #6) -> Review-Aware 3.23 (Rank #32, change -26) | clean=-0.82, loc=+0.50, quiet=-0.93, serv=-0.98
+
+========================================================================================
+TEST CASE 3: COLD-START RECOMMENDATION FOR A BRAND-NEW GUEST
+Guest ID: NEW_GUEST_01 (0 prior ratings in ratings.csv)
+Natural-Language Request: "peaceful heritage homestay near ancient town with spotless room, kind local host, and reliable wifi"
+Detected Query Aspect Weights: cleanliness=0.20, location=0.30, quietness=0.20, service=0.30
+----------------------------------------------------------------------------------------
+Note: Pure User-Based CF has no rating history for NEW_GUEST_01. Our Review-Aware Cold-Start pipeline falls back seamlessly to Query TF-IDF + Query-Weighted Aspect Sentiment + Popularity Prior:
+
+[3A] Review-Aware Cold-Start Hybrid - Top 5:
+  #1 [S022] Ancient Courtyard Homestay (Hoi An Ancient Town, mid-range) | Hybrid Score: 0.9583 | TF-IDF: 0.3666 | Aspect Sent: +0.961
+      Details: TF-IDF=0.367 | Aspects(clean=+0.93, loc=+0.97, quiet=+0.97, serv=+0.97) | Keywords: town, ancient, ancient town, local host, host reliable
+  #2 [S023] Thu Bon Lantern Villa (Hoi An Ancient Town, mid-range) | Hybrid Score: 0.8530 | TF-IDF: 0.2948 | Aspect Sent: +0.956
+      Details: TF-IDF=0.295 | Aspects(clean=+0.93, loc=+0.97, quiet=+0.96, serv=+0.97) | Keywords: town, heritage, ancient town, ancient, town spotless
+  #3 [S027] Old Quarter Tailor Inn (Hoi An Ancient Town, mid-range) | Hybrid Score: 0.8449 | TF-IDF: 0.2974 | Aspect Sent: +0.906
+      Details: TF-IDF=0.297 | Aspects(clean=+0.91, loc=+0.79, quiet=+0.95, serv=+0.97) | Keywords: town spotless, ancient, town, ancient town, heritage
+  #4 [S025] Cam Nam Heritage House (Hoi An Ancient Town, mid-range) | Hybrid Score: 0.8441 | TF-IDF: 0.3039 | Aspect Sent: +0.900
+      Details: TF-IDF=0.304 | Aspects(clean=+0.92, loc=+0.78, quiet=+0.94, serv=+0.96) | Keywords: ancient, town, ancient town, heritage, town spotless
+  #5 [S024] Rice Field Breeze Homestay (Hoi An Ancient Town, budget) | Hybrid Score: 0.7963 | TF-IDF: 0.2706 | Aspect Sent: +0.909
+      Details: TF-IDF=0.271 | Aspects(clean=+0.95, loc=+0.81, quiet=+0.92, serv=+0.96) | Keywords: town, ancient, ancient town, heritage, town spotless
+
+[3B] Pure NLP Content-Based Cold-Start - Top 5:
+  #1 [S022] Ancient Courtyard Homestay (Hoi An Ancient Town, mid-range) | TF-IDF Score: 0.3666 | Keywords: town, ancient, ancient town, local host, host reliable
+  #2 [S025] Cam Nam Heritage House (Hoi An Ancient Town, mid-range) | TF-IDF Score: 0.3039 | Keywords: ancient, town, ancient town, heritage, town spotless
+  #3 [S027] Old Quarter Tailor Inn (Hoi An Ancient Town, mid-range) | TF-IDF Score: 0.2974 | Keywords: town spotless, ancient, town, ancient town, heritage
+  #4 [S023] Thu Bon Lantern Villa (Hoi An Ancient Town, mid-range) | TF-IDF Score: 0.2948 | Keywords: town, heritage, ancient town, ancient, town spotless
+  #5 [S024] Rice Field Breeze Homestay (Hoi An Ancient Town, budget) | TF-IDF Score: 0.2706 | Keywords: town, ancient, ancient town, heritage, town spotless
+
+========================================================================================
